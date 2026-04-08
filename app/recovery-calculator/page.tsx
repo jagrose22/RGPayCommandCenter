@@ -80,7 +80,7 @@ const REGIONAL_DEFAULTS: Record<string, {
     defaultPaymentGap: 40,
     defaultRecoveryRate: 35,
     defaultSessions: 8500,
-    defaultBookingValue: 847
+    defaultBookingValue: 850  // ~₹70,550 in local display
   },
   "LATAM": {
     altPayPercent: 15,
@@ -430,6 +430,7 @@ export default function RecoveryCalculatorPage() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <p className="text-xs text-muted-foreground mt-1">Segment factor applied to recovery</p>
                     </div>
                   </div>
                   
@@ -468,7 +469,7 @@ export default function RecoveryCalculatorPage() {
                     <div>
                       <div className="flex justify-between mb-2">
                         <label className="text-sm font-medium text-foreground">Average Booking Value</label>
-                        <span className="text-sm font-semibold text-[#8021FF]">${avgBookingValue.toLocaleString()}</span>
+                        <span className="text-sm font-semibold text-[#8021FF]">{formatCurrencyFull(avgBookingValue, market)}</span>
                       </div>
                       <Slider
                         value={[avgBookingValue]}
@@ -692,24 +693,24 @@ export default function RecoveryCalculatorPage() {
                   </Card>
                 </div>
 
-                {/* Recovery Breakdown */}
+                {/* Recovery Breakdown (All Annual) */}
                 <Card className="p-6 border border-border">
                   <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                     <div className="w-2 h-2 bg-[#8021FF] rounded-full" />
-                    Recovery Breakdown
+                    Annual Recovery Breakdown
                   </h4>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center py-2 border-b border-border">
-                      <span className="text-sm text-muted-foreground">Base Recovery (monthly)</span>
-                      <span className="font-medium text-foreground">{formatCurrency(calculations.baseRecovery, market)}</span>
+                      <span className="text-sm text-muted-foreground">Base Recovery</span>
+                      <span className="font-medium text-foreground">{formatCurrency(calculations.baseRecovery * 12, market)}</span>
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-border">
                       <span className="text-sm text-muted-foreground">Alternative Payment Add-On</span>
-                      <span className="font-medium text-foreground">+{formatCurrency(calculations.altPayRecovery, market)}</span>
+                      <span className="font-medium text-foreground">+{formatCurrency(calculations.altPayRecovery * 12, market)}</span>
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-border">
                       <span className="text-sm text-muted-foreground">Retry Recovery Add-On</span>
-                      <span className="font-medium text-foreground">+{formatCurrency(calculations.retryRecoveryAmount, market)}</span>
+                      <span className="font-medium text-foreground">+{formatCurrency(calculations.retryRecoveryAmount * 12, market)}</span>
                     </div>
                     <div className="flex justify-between items-center py-2 bg-[#8021FF]/5 rounded-lg px-3 -mx-3">
                       <span className="text-sm font-semibold text-foreground">Total Annual Recovery</span>
