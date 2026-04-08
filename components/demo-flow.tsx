@@ -5,7 +5,6 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { PhoneMockup } from "@/components/phone-mockup"
 import { ArrowLeft, ArrowRight, AlertTriangle, Loader2, CheckCircle2 } from "lucide-react"
-import { Calculator } from "@/components/calculator"
 
 interface Account {
   id: string
@@ -386,23 +385,10 @@ const getStep6Subtext = (config: ReturnType<typeof getAccountConfig>) => {
   return "Revenue recovered. Guest retained. Margin protected. No MakeMyTrip. No Booking.com. No commission. This is what RG Pay does for every non-NA guest your checkout currently turns away."
 }
 
-// Calculator placeholder values by account
-const getCalculatorPlaceholders = (config: ReturnType<typeof getAccountConfig>) => {
-  if (config.isWyndham) return { sessions: "8,500", avgValue: "$847", conversion: "3" }
-  if (config.isMarriott) return { sessions: "12,000", avgValue: "$1,322", conversion: "2.5" }
-  if (config.isIHG) return { sessions: "10,500", avgValue: "$1,449", conversion: "2.8" }
-  if (config.isHertz) return { sessions: "6,000", avgValue: "$717", conversion: "4" }
-  if (config.isDespegar) return { sessions: "9,000", avgValue: "$1,782", conversion: "3.2" }
-  if (config.isBAHolidays) return { sessions: "7,500", avgValue: "$1,932", conversion: "2.5" }
-  // Default for non-custom accounts
-  return { sessions: "10,000", avgValue: "$500", conversion: "3" }
-}
-
 function StepSixContent({ account, onRunAnother }: { account: Account; onRunAnother: () => void }) {
   const config = getAccountConfig(account)
   const commissionAvoided = config.commissionAvoided.toFixed(2)
   const subtext = getStep6Subtext(config)
-  const placeholders = getCalculatorPlaceholders(config)
   
   return (
     <div className="mb-8 space-y-4">
@@ -434,11 +420,6 @@ function StepSixContent({ account, onRunAnother }: { account: Account; onRunAnot
       
       {/* Subtext */}
       <p className="text-xs text-[#6B7280] leading-relaxed">{subtext}</p>
-
-      {/* Interactive Calculator - only for custom demo accounts */}
-      {config.hasCustomDemo && (
-        <Calculator placeholders={placeholders} />
-      )}
 
       {/* CTA Buttons */}
       <div className="flex gap-3 pt-2">
