@@ -998,59 +998,108 @@ function DemandAudit({ onSwitchToExecutive }: DemandAuditProps) {
         </div>
       </Card>
 
-      {/* Benchmark Comparison Table */}
-      <Card className="border border-border overflow-hidden">
-        <div className="p-4 border-b border-border bg-muted/30">
-          <h3 className="font-semibold text-foreground">Rail Coverage Comparison — {territory.name}</h3>
+      {/* Benchmark Matrix - Hero Visual */}
+      <Card className="border-2 border-border overflow-hidden shadow-lg">
+        <div className="p-5 border-b border-border bg-muted/30">
+          <h3 className="text-lg font-bold text-foreground">Rail Coverage Benchmark — {territory.name}</h3>
           <p className="text-sm text-muted-foreground">Number of supported providers per payment rail</p>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full">
+            {/* Column Headers - Payment Rails */}
             <thead>
-              <tr className="border-b border-border bg-muted/20">
-                <th className="text-left py-3 px-4 font-medium text-muted-foreground">Payment Rail</th>
-                <th className="text-center py-3 px-4 font-medium text-green-600">Gold Standard</th>
-                <th className="text-center py-3 px-4 font-medium text-amber-600">Market Avg</th>
-                <th className="text-center py-3 px-4 font-medium text-foreground">{currentOTA.name}</th>
-                <th className="text-center py-3 px-4 font-medium text-red-600">Gap</th>
+              <tr className="border-b-2 border-border">
+                <th className="py-4 px-6 text-left font-semibold text-muted-foreground w-48">Benchmark</th>
+                {territory.railLabels.map((rail) => (
+                  <th key={rail} className="py-4 px-4 text-center font-semibold text-foreground min-w-[100px]">
+                    {rail}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {gaps.map((row, idx) => (
-                <tr key={row.rail} className={`border-b border-border ${idx % 2 === 0 ? "bg-card" : "bg-muted/10"}`}>
-                  <td className="py-3 px-4 font-medium text-foreground">{row.rail}</td>
-                  <td className="py-3 px-4 text-center">
-                    <span className="inline-flex items-center justify-center w-10 h-8 rounded bg-green-100 text-green-700 font-semibold">
-                      {row.gold}
-                    </span>
+              {/* Row 1: Gold Standard - Soft Green Band */}
+              <tr className="bg-green-50 dark:bg-green-950/30 border-b border-green-200 dark:border-green-900">
+                <td className="py-5 px-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <span className="font-semibold text-green-700 dark:text-green-400">Gold Standard</span>
+                  </div>
+                </td>
+                {territory.gold.map((value, idx) => (
+                  <td key={idx} className="py-5 px-4 text-center">
+                    <span className="text-xl font-bold text-green-700 dark:text-green-400">{value}</span>
                   </td>
-                  <td className="py-3 px-4 text-center">
-                    <span className="inline-flex items-center justify-center w-10 h-8 rounded bg-amber-100 text-amber-700 font-semibold">
-                      {row.average}
-                    </span>
+                ))}
+              </tr>
+              
+              {/* Row 2: Market Average - Soft Amber Band */}
+              <tr className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-900">
+                <td className="py-5 px-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-amber-500" />
+                    <span className="font-semibold text-amber-700 dark:text-amber-400">Market Average</span>
+                  </div>
+                </td>
+                {territory.average.map((value, idx) => (
+                  <td key={idx} className="py-5 px-4 text-center">
+                    <span className="text-xl font-bold text-amber-700 dark:text-amber-400">{value}</span>
                   </td>
-                  <td className="py-3 px-4 text-center">
-                    <span className={`inline-flex items-center justify-center w-10 h-8 rounded font-semibold ${
-                      row.gapFromGold > 5 ? "bg-red-100 text-red-700" : "bg-gray-100 text-foreground"
-                    }`}>
-                      {row.ota}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    {row.gapFromGold > 0 ? (
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                        row.gapFromGold > 5 ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
-                      }`}>
-                        -{row.gapFromGold}
-                      </span>
-                    ) : (
-                      <span className="text-green-600 font-medium">-</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                ))}
+              </tr>
+              
+              {/* Row 3: Selected OTA - Heat-colored cells */}
+              <tr className="border-b border-border">
+                <td className="py-5 px-6 bg-muted/20">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#8021FF]" />
+                    <span className="font-semibold text-foreground">{currentOTA.name}</span>
+                  </div>
+                </td>
+                {currentOTA.rails.map((value, idx) => {
+                  const goldVal = territory.gold[idx]
+                  const avgVal = territory.average[idx]
+                  // Determine cell color based on benchmark position
+                  let cellBg = ""
+                  let textColor = ""
+                  if (value >= goldVal) {
+                    // At or above gold = green
+                    cellBg = "bg-green-100 dark:bg-green-900/40"
+                    textColor = "text-green-700 dark:text-green-400"
+                  } else if (value >= avgVal) {
+                    // Above average but below gold = amber
+                    cellBg = "bg-amber-100 dark:bg-amber-900/40"
+                    textColor = "text-amber-700 dark:text-amber-400"
+                  } else {
+                    // Below market average = red
+                    cellBg = "bg-red-100 dark:bg-red-900/40"
+                    textColor = "text-red-700 dark:text-red-400"
+                  }
+                  return (
+                    <td key={idx} className={`py-5 px-4 text-center ${cellBg}`}>
+                      <span className={`text-xl font-bold ${textColor}`}>{value}</span>
+                    </td>
+                  )
+                })}
+              </tr>
             </tbody>
           </table>
+        </div>
+        
+        {/* Matrix Legend */}
+        <div className="px-6 py-4 bg-muted/20 border-t border-border flex flex-wrap gap-6 text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-green-100 border border-green-300" />
+            <span className="text-muted-foreground">At/above gold standard</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-amber-100 border border-amber-300" />
+            <span className="text-muted-foreground">Above average, below gold</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-red-100 border border-red-300" />
+            <span className="text-muted-foreground">Below market average</span>
+          </div>
         </div>
       </Card>
 
