@@ -922,17 +922,44 @@ export default function RecoveryCalculatorPage() {
 
       <main className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="mb-10">
+        <div className="mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#8021FF]/10 rounded-full mb-4">
             <Sparkles className="w-3.5 h-3.5 text-[#8021FF]" />
-            <span className="text-xs font-medium text-[#8021FF]">RG Pay</span>
+            <span className="text-xs font-medium text-[#8021FF]">RG Pay Revenue Calculator</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3 text-balance">
-            Revenue savings calculator
+            Direct booking savings model
           </h1>
           <p className="text-muted-foreground max-w-2xl text-pretty">
             Quantify the revenue shift from OTA to direct and the net savings retained through localized checkout
           </p>
+        </div>
+
+        {/* HERO KPI RIBBON - Value at a Glance */}
+        <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-[#8021FF]/10 via-[#8021FF]/5 to-transparent border border-[#8021FF]/20">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Projected Annual Net Savings</p>
+              <div className="flex items-baseline gap-3">
+                <span className="text-4xl md:text-5xl font-bold text-[#8021FF]">{formatINR(calculations.annualSavingsINR)}</span>
+                <span className="text-lg text-muted-foreground">{formatUSD(calculations.annualSavingsUSD)}</span>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 md:gap-8">
+              <div className="text-center md:text-right">
+                <p className="text-xs text-muted-foreground mb-1">Direct Shift</p>
+                <p className="text-xl font-bold text-foreground">+{calculations.shift}%</p>
+              </div>
+              <div className="text-center md:text-right">
+                <p className="text-xs text-muted-foreground mb-1">Net Margin</p>
+                <p className="text-xl font-bold text-green-600">{calculations.netSavingsPercent.toFixed(1)}%</p>
+              </div>
+              <div className="text-center md:text-right">
+                <p className="text-xs text-muted-foreground mb-1">Monthly</p>
+                <p className="text-xl font-bold text-foreground">{formatINR(calculations.monthlySavingsINR)}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -953,11 +980,11 @@ export default function RecoveryCalculatorPage() {
           {/* ================================================================ */}
           <TabsContent value="executive" className="mt-8 space-y-8">
             
-            {/* TOP INPUT STRIP - Always Visible */}
-            <Card className="p-6 border border-border">
+            {/* TOP INPUT STRIP - Premium Styled */}
+            <Card className="p-6 border-t-4 border-t-[#8021FF] border border-border shadow-lg bg-card">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-[#8021FF]/10 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-5 h-5 text-[#8021FF]" />
+                <div className="w-10 h-10 bg-[#8021FF] rounded-lg flex items-center justify-center shadow-md">
+                  <Building2 className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Property Inputs</h3>
@@ -1088,41 +1115,63 @@ export default function RecoveryCalculatorPage() {
               </Card>
             </div>
 
-            {/* COMMERCIAL INSIGHT BAND */}
-            <Card className="p-5 border-l-4 border-l-[#8021FF] border border-border bg-[#8021FF]/5">
-              <p className="text-foreground">
-                A <span className="font-semibold text-[#8021FF]">{calculations.shift}-point</span> direct shift delivers{" "}
-                <span className="font-semibold text-[#8021FF]">{formatINR(calculations.annualSavingsINR)}</span> in annual net savings while avoiding{" "}
-                <span className="font-semibold text-[#8021FF]">{formatINR(calculations.otaCommissionAvoidedINR)}</span> in OTA commissions.
-              </p>
-            </Card>
+            {/* COMMERCIAL INSIGHT BAND - Story-driven */}
+            <div className="relative p-6 rounded-xl bg-gradient-to-r from-[#8021FF]/10 to-[#8021FF]/5 border border-[#8021FF]/20 overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#8021FF]/10 rounded-full blur-3xl -mr-16 -mt-16" />
+              <div className="relative">
+                <p className="text-xs font-medium text-[#8021FF] uppercase tracking-wide mb-2">Commercial Impact</p>
+                <p className="text-lg text-foreground leading-relaxed">
+                  <span className="font-bold text-[#8021FF]">+{calculations.shift}% direct capture</span>
+                  <span className="mx-2 text-muted-foreground">→</span>
+                  <span className="font-bold text-green-600">{formatINR(calculations.otaCommissionAvoidedINR)}</span>
+                  <span className="text-muted-foreground"> OTA commission avoided</span>
+                </p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Net savings of {formatINR(calculations.annualSavingsINR)} annually after RG Pay processing fees
+                </p>
+              </div>
+            </div>
 
-            {/* HERO KPI CARD */}
-            <Card className="p-8 bg-gradient-to-br from-[#8021FF] to-[#6010DD] text-white">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-5 h-5 text-white/80" />
-                <span className="text-white/80 text-sm font-medium uppercase tracking-wide">Projected Annual Net Savings</span>
-              </div>
-              <div className="text-5xl md:text-6xl font-bold mb-2">
-                {formatINR(calculations.annualSavingsINR)}
-              </div>
-              <div className="text-xl text-white/80 mb-4">
-                {formatUSD(calculations.annualSavingsUSD)}
-              </div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-full">
-                <span className="text-sm text-white/90">Based on +{calculations.shift}% direct capture</span>
-              </div>
-            </Card>
-
-            {/* SUPPORTING KPI ROW (3 Cards) */}
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* OTA Commission Avoided */}
-              <Card className="p-6 border border-border">
-                <div className="flex items-center gap-2 mb-3">
-                  <DollarSign className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-muted-foreground">OTA Commission Avoided</span>
+            {/* HERO KPI CARD - Premium Gradient */}
+            <Card className="relative overflow-hidden p-8 bg-gradient-to-br from-[#8021FF] via-[#6B1AD6] to-[#4A0FB0] text-white shadow-2xl">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl -ml-24 -mb-24" />
+              <div className="relative">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-white/90 text-sm font-medium uppercase tracking-wide">Projected Annual Net Savings</span>
                 </div>
-                <div className="text-2xl font-bold text-foreground mb-1">
+                <div className="text-5xl md:text-6xl font-bold mb-2 tracking-tight">
+                  {formatINR(calculations.annualSavingsINR)}
+                </div>
+                <div className="text-xl text-white/70 mb-6">
+                  {formatUSD(calculations.annualSavingsUSD)}
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-sm font-medium">
+                    <TrendingUp className="w-4 h-4" />
+                    +{calculations.shift}% direct capture
+                  </span>
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/30 rounded-full text-sm font-medium">
+                    {calculations.netSavingsPercent.toFixed(1)}% net margin
+                  </span>
+                </div>
+              </div>
+            </Card>
+
+            {/* SUPPORTING KPI ROW (3 Cards) - Color-coded */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* OTA Commission Avoided - Green accent */}
+              <Card className="p-6 border border-border bg-gradient-to-br from-green-50 to-transparent dark:from-green-950/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                    <DollarSign className="w-4 h-4 text-green-600" />
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">OTA Commission Avoided</span>
+                </div>
+                <div className="text-2xl font-bold text-green-600 mb-1">
                   {formatINR(calculations.otaCommissionAvoidedINR)}
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -1130,13 +1179,15 @@ export default function RecoveryCalculatorPage() {
                 </div>
               </Card>
 
-              {/* Direct Revenue Retained */}
-              <Card className="p-6 border border-border">
+              {/* Direct Revenue Retained - Purple accent */}
+              <Card className="p-6 border border-border bg-gradient-to-br from-[#8021FF]/5 to-transparent">
                 <div className="flex items-center gap-2 mb-3">
-                  <Target className="w-4 h-4 text-[#8021FF]" />
-                  <span className="text-sm text-muted-foreground">Direct Revenue Retained</span>
+                  <div className="w-8 h-8 bg-[#8021FF]/10 rounded-lg flex items-center justify-center">
+                    <Target className="w-4 h-4 text-[#8021FF]" />
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">Direct Revenue Retained</span>
                 </div>
-                <div className="text-2xl font-bold text-foreground mb-1">
+                <div className="text-2xl font-bold text-[#8021FF] mb-1">
                   {formatINR(calculations.directRevenueINR)}
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -1144,13 +1195,15 @@ export default function RecoveryCalculatorPage() {
                 </div>
               </Card>
 
-              {/* Monthly Savings */}
-              <Card className="p-6 border border-border">
+              {/* Monthly Savings - Amber accent */}
+              <Card className="p-6 border border-border bg-gradient-to-br from-amber-50 to-transparent dark:from-amber-950/20">
                 <div className="flex items-center gap-2 mb-3">
-                  <Clock className="w-4 h-4 text-amber-500" />
-                  <span className="text-sm text-muted-foreground">Monthly Savings</span>
+                  <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">Monthly Savings</span>
                 </div>
-                <div className="text-2xl font-bold text-foreground mb-1">
+                <div className="text-2xl font-bold text-amber-600 mb-1">
                   {formatINR(calculations.monthlySavingsINR)}
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -1244,19 +1297,21 @@ export default function RecoveryCalculatorPage() {
               </AccordionItem>
             </Accordion>
 
-            {/* BOTTOM CTA PANEL */}
-            <Card className="p-6 border border-[#8021FF]/20 bg-gradient-to-r from-[#8021FF]/5 to-transparent">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            {/* BOTTOM CTA PANEL - Premium */}
+            <Card className="relative overflow-hidden p-8 border-2 border-[#8021FF]/30 bg-gradient-to-r from-[#8021FF]/10 via-[#8021FF]/5 to-transparent">
+              <div className="absolute top-0 right-0 w-64 h-32 bg-[#8021FF]/10 rounded-full blur-3xl -mr-32" />
+              <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">
-                    Projected annual savings and direct revenue retention from improved checkout conversion.
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    Ready to explore regional opportunities?
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Model property-level and portfolio-level savings scenarios
+                  <p className="text-muted-foreground">
+                    Dive into market-specific payment intelligence for India, China, Brazil, and Indonesia
                   </p>
                 </div>
                 <Button 
-                  className="bg-[#8021FF] hover:bg-[#6B1AD6] text-white shrink-0"
+                  size="lg"
+                  className="bg-[#8021FF] hover:bg-[#6B1AD6] text-white shrink-0 shadow-lg shadow-[#8021FF]/25 transition-all hover:shadow-xl hover:shadow-[#8021FF]/30"
                   onClick={() => setActiveTab("geography")}
                 >
                   Explore regional market dossier
