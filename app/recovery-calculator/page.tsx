@@ -809,6 +809,320 @@ function RegionalMarketDossier() {
 }
 
 // ============================================================================
+// DEMAND AUDIT DATA
+// ============================================================================
+type DemandTerritoryKey = "india" | "indonesia" | "china" | "brazil"
+
+interface OTAData {
+  name: string
+  rails: number[]  // [Banks, UPI/SuperApp, Wallets, APM, BNPL, Crypto, Local Credit]
+}
+
+interface TerritoryBenchmark {
+  name: string
+  code: string
+  railLabels: string[]
+  gold: number[]      // Gold standard benchmark
+  average: number[]   // Market average
+  otas: OTAData[]     // OTA-specific data
+  riskCallout: string // Territory-specific risk statement
+}
+
+const DEMAND_AUDIT_DATA: Record<DemandTerritoryKey, TerritoryBenchmark> = {
+  india: {
+    name: "India",
+    code: "IN",
+    railLabels: ["Banks", "UPI Apps", "Wallets", "APM", "BNPL", "Crypto", "Local Credit"],
+    gold: [5, 5, 50, 10, 20, 2, 3],
+    average: [4, 4, 35, 6, 12, 1, 2],
+    otas: [
+      { name: "MakeMyTrip", rails: [4, 3, 28, 5, 8, 0, 1] },
+      { name: "Goibibo", rails: [4, 3, 25, 4, 6, 0, 1] },
+      { name: "EaseMyTrip", rails: [3, 2, 18, 3, 4, 0, 0] },
+      { name: "Yatra", rails: [3, 2, 15, 3, 5, 0, 1] }
+    ],
+    riskCallout: "MakeMyTrip trails gold standard by 22 wallet providers and 12 BNPL options — a direct conversion gap for UPI-native travelers."
+  },
+  indonesia: {
+    name: "Indonesia",
+    code: "ID",
+    railLabels: ["Banks", "E-Wallets", "VA Transfer", "APM", "BNPL", "Crypto", "Local Credit"],
+    gold: [8, 6, 45, 8, 15, 1, 4],
+    average: [6, 4, 30, 5, 8, 0, 2],
+    otas: [
+      { name: "Traveloka", rails: [6, 5, 32, 5, 10, 0, 2] },
+      { name: "Tiket.com", rails: [5, 4, 25, 4, 7, 0, 1] },
+      { name: "PegiPegi", rails: [4, 3, 20, 3, 5, 0, 1] }
+    ],
+    riskCallout: "Traveloka missing 13 VA bank connections and 5 BNPL providers vs. gold standard — high-value travelers defaulting to direct bank transfer."
+  },
+  china: {
+    name: "China",
+    code: "CN",
+    railLabels: ["Banks", "Alipay/WeChat", "Wallets", "APM", "BNPL", "Crypto", "Local Credit"],
+    gold: [6, 4, 40, 12, 18, 0, 5],
+    average: [5, 3, 28, 8, 10, 0, 3],
+    otas: [
+      { name: "Ctrip", rails: [5, 4, 30, 8, 12, 0, 3] },
+      { name: "Fliggy", rails: [5, 3, 25, 6, 8, 0, 2] },
+      { name: "Qunar", rails: [4, 3, 22, 5, 6, 0, 2] },
+      { name: "Meituan", rails: [5, 4, 28, 7, 10, 0, 2] }
+    ],
+    riskCallout: "Ctrip missing 10 wallet integrations and 6 BNPL options — super-app travelers expect complete coverage at checkout."
+  },
+  brazil: {
+    name: "Brazil",
+    code: "BR",
+    railLabels: ["Banks", "Pix Apps", "Wallets", "APM", "BNPL", "Crypto", "Parcelado"],
+    gold: [7, 5, 35, 10, 16, 2, 6],
+    average: [5, 4, 22, 6, 10, 1, 4],
+    otas: [
+      { name: "Decolar", rails: [5, 4, 20, 5, 8, 0, 4] },
+      { name: "Submarino Viagens", rails: [4, 3, 15, 4, 6, 0, 3] },
+      { name: "Hotel Urbano", rails: [4, 3, 18, 4, 7, 0, 3] }
+    ],
+    riskCallout: "Decolar trails gold standard by 15 wallet providers and 8 BNPL options — parcelado-first travelers abandoning at payment."
+  }
+}
+
+// ============================================================================
+// DEMAND AUDIT COMPONENT
+// ============================================================================
+interface DemandAuditProps {
+  onSwitchToExecutive: () => void
+}
+
+function DemandAudit({ onSwitchToExecutive }: DemandAuditProps) {
+  const [selectedTerritory, setSelectedTerritory] = useState<DemandTerritoryKey>("india")
+  const [selectedOTA, setSelectedOTA] = useState<string>("")
+  
+  const territory = DEMAND_AUDIT_DATA[selectedTerritory]
+  const territories: DemandTerritoryKey[] = ["india", "indonesia", "china", "brazil"]
+  
+  // Set default OTA when territory changes
+  const currentOTA = territory.otas.find(o => o.name === selectedOTA) || territory.otas[0]
+  
+  // Calculate gaps
+  const gaps = territory.gold.map((goldVal, idx) => ({
+    rail: territory.railLabels[idx],
+    gold: goldVal,
+    average: territory.average[idx],
+    ota: currentOTA.rails[idx],
+    gapFromGold: goldVal - currentOTA.rails[idx],
+    gapFromAverage: territory.average[idx] - currentOTA.rails[idx]
+  }))
+  
+  // Find critical gaps (>5 providers behind gold)
+  const criticalGaps = gaps.filter(g => g.gapFromGold > 5)
+  
+  // Calculate totals
+  const totalGold = territory.gold.reduce((a, b) => a + b, 0)
+  const totalOTA = currentOTA.rails.reduce((a, b) => a + b, 0)
+  const totalGap = totalGold - totalOTA
+  const gapPercentage = Math.round((totalGap / totalGold) * 100)
+
+  return (
+    <div className="space-y-8">
+      {/* Header Banner */}
+      <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-6 flex items-center justify-between">
+        <div className="text-white">
+          <p className="text-lg font-semibold">Demand-Side Payment Audit</p>
+          <p className="text-white/80">Where OTAs lag. Which rails are missing. How far behind gold standard.</p>
+        </div>
+        <span className="px-4 py-2 bg-white/20 rounded-full text-white text-sm font-medium">
+          Competitive intelligence
+        </span>
+      </div>
+
+      {/* Territory + OTA Selection */}
+      <div className="flex flex-wrap gap-4 items-end">
+        <div className="flex-1 min-w-[200px]">
+          <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Select Territory</label>
+          <div className="flex gap-2">
+            {territories.map((key) => {
+              const t = DEMAND_AUDIT_DATA[key]
+              const isSelected = selectedTerritory === key
+              return (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setSelectedTerritory(key)
+                    setSelectedOTA("")
+                  }}
+                  className={`px-4 py-2 rounded-lg border font-medium transition-all ${
+                    isSelected 
+                      ? "bg-[#8021FF] text-white border-[#8021FF]" 
+                      : "bg-card border-border text-foreground hover:border-[#8021FF]/50"
+                  }`}
+                >
+                  {t.code} {t.name}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+        
+        <div className="min-w-[200px]">
+          <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Select OTA</label>
+          <select
+            value={selectedOTA || currentOTA.name}
+            onChange={(e) => setSelectedOTA(e.target.value)}
+            className="w-full h-10 px-3 rounded-lg border border-border bg-card text-foreground"
+          >
+            {territory.otas.map((ota) => (
+              <option key={ota.name} value={ota.name}>{ota.name}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Gap Summary Hero */}
+      <Card className="p-6 border-l-4 border-l-red-500 bg-red-50 dark:bg-red-950/20">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-red-600 uppercase tracking-wide mb-1">Coverage Gap vs Gold Standard</p>
+            <p className="text-3xl font-bold text-red-700">{totalGap} providers missing</p>
+            <p className="text-sm text-red-600/80 mt-1">{currentOTA.name} covers {totalOTA} of {totalGold} gold-standard providers ({gapPercentage}% gap)</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-green-600">{totalGold}</p>
+              <p className="text-xs text-muted-foreground">Gold Standard</p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-muted-foreground" />
+            <div className="text-center">
+              <p className="text-2xl font-bold text-red-600">{totalOTA}</p>
+              <p className="text-xs text-muted-foreground">{currentOTA.name}</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Benchmark Comparison Table */}
+      <Card className="border border-border overflow-hidden">
+        <div className="p-4 border-b border-border bg-muted/30">
+          <h3 className="font-semibold text-foreground">Rail Coverage Comparison — {territory.name}</h3>
+          <p className="text-sm text-muted-foreground">Number of supported providers per payment rail</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-muted/20">
+                <th className="text-left py-3 px-4 font-medium text-muted-foreground">Payment Rail</th>
+                <th className="text-center py-3 px-4 font-medium text-green-600">Gold Standard</th>
+                <th className="text-center py-3 px-4 font-medium text-amber-600">Market Avg</th>
+                <th className="text-center py-3 px-4 font-medium text-foreground">{currentOTA.name}</th>
+                <th className="text-center py-3 px-4 font-medium text-red-600">Gap</th>
+              </tr>
+            </thead>
+            <tbody>
+              {gaps.map((row, idx) => (
+                <tr key={row.rail} className={`border-b border-border ${idx % 2 === 0 ? "bg-card" : "bg-muted/10"}`}>
+                  <td className="py-3 px-4 font-medium text-foreground">{row.rail}</td>
+                  <td className="py-3 px-4 text-center">
+                    <span className="inline-flex items-center justify-center w-10 h-8 rounded bg-green-100 text-green-700 font-semibold">
+                      {row.gold}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-center">
+                    <span className="inline-flex items-center justify-center w-10 h-8 rounded bg-amber-100 text-amber-700 font-semibold">
+                      {row.average}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-center">
+                    <span className={`inline-flex items-center justify-center w-10 h-8 rounded font-semibold ${
+                      row.gapFromGold > 5 ? "bg-red-100 text-red-700" : "bg-gray-100 text-foreground"
+                    }`}>
+                      {row.ota}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-center">
+                    {row.gapFromGold > 0 ? (
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                        row.gapFromGold > 5 ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+                      }`}>
+                        -{row.gapFromGold}
+                      </span>
+                    ) : (
+                      <span className="text-green-600 font-medium">-</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {/* Critical Gap Callouts */}
+      {criticalGaps.length > 0 && (
+        <Card className="p-6 border border-border">
+          <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+            <div className="w-2 h-2 bg-red-500 rounded-full" />
+            Critical Coverage Gaps
+          </h4>
+          <div className="grid md:grid-cols-2 gap-4">
+            {criticalGaps.map((gap) => (
+              <div key={gap.rail} className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-foreground">{gap.rail}</span>
+                  <span className="text-red-600 font-bold">-{gap.gapFromGold} providers</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-red-500 rounded-full"
+                      style={{ width: `${(gap.ota / gap.gold) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-muted-foreground">{gap.ota}/{gap.gold}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Commercial Risk Callout */}
+      <Card className="p-6 border-l-4 border-l-[#8021FF] bg-[#8021FF]/5">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 bg-[#8021FF] rounded-lg flex items-center justify-center shrink-0">
+            <Target className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="font-semibold text-foreground mb-1">Commercial Risk Insight</p>
+            <p className="text-foreground">{territory.riskCallout}</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* CTA Panel */}
+      <Card className="relative overflow-hidden p-8 border-2 border-[#8021FF]/30 bg-gradient-to-r from-[#8021FF]/10 via-[#8021FF]/5 to-transparent">
+        <div className="absolute top-0 right-0 w-64 h-32 bg-[#8021FF]/10 rounded-full blur-3xl -mr-32" />
+        <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              See How RG Pay Closes This Gap
+            </h3>
+            <p className="text-muted-foreground">
+              Calculate the revenue impact of full rail coverage with RG Pay
+            </p>
+          </div>
+          <Button 
+            size="lg"
+            className="bg-[#8021FF] hover:bg-[#6B1AD6] text-white shrink-0 shadow-lg shadow-[#8021FF]/25 transition-all hover:shadow-xl hover:shadow-[#8021FF]/30"
+            onClick={onSwitchToExecutive}
+          >
+            Open Revenue Calculator
+            <ArrowUpRight className="w-4 h-4 ml-2" />
+          </Button>
+        </div>
+      </Card>
+    </div>
+  )
+}
+
+// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 export default function RecoveryCalculatorPage() {
@@ -935,43 +1249,55 @@ export default function RecoveryCalculatorPage() {
           </p>
         </div>
 
-        {/* HERO KPI RIBBON - Value at a Glance */}
-        <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-[#8021FF]/10 via-[#8021FF]/5 to-transparent border border-[#8021FF]/20">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Projected Annual Net Savings</p>
-              <div className="flex items-baseline gap-3">
-                <span className="text-4xl md:text-5xl font-bold text-[#8021FF]">{formatINR(calculations.annualSavingsINR)}</span>
-                <span className="text-lg text-muted-foreground">{formatUSD(calculations.annualSavingsUSD)}</span>
+        {/* COMPACT KPI STRIP - Executive Summary */}
+        <div className="mb-8 px-6 py-4 rounded-xl bg-muted/50 border border-border">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Direct Shift</span>
+                <span className="text-lg font-bold text-[#8021FF]">+{calculations.shift}%</span>
+              </div>
+              <div className="w-px h-6 bg-border" />
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Net Margin</span>
+                <span className="text-lg font-bold text-green-600">{calculations.netSavingsPercent.toFixed(1)}%</span>
+              </div>
+              <div className="w-px h-6 bg-border hidden sm:block" />
+              <div className="flex items-center gap-2 hidden sm:flex">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Monthly</span>
+                <span className="text-lg font-bold text-foreground">{formatINR(calculations.monthlySavingsINR)}</span>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 md:gap-8">
-              <div className="text-center md:text-right">
-                <p className="text-xs text-muted-foreground mb-1">Direct Shift</p>
-                <p className="text-xl font-bold text-foreground">+{calculations.shift}%</p>
-              </div>
-              <div className="text-center md:text-right">
-                <p className="text-xs text-muted-foreground mb-1">Net Margin</p>
-                <p className="text-xl font-bold text-green-600">{calculations.netSavingsPercent.toFixed(1)}%</p>
-              </div>
-              <div className="text-center md:text-right">
-                <p className="text-xs text-muted-foreground mb-1">Monthly</p>
-                <p className="text-xl font-bold text-foreground">{formatINR(calculations.monthlySavingsINR)}</p>
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Annual</span>
+              <span className="text-lg font-bold text-foreground">{formatINR(calculations.annualSavingsINR)}</span>
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs - Enhanced Visibility */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="executive" className="flex items-center gap-2">
+          <TabsList className="grid w-full max-w-2xl grid-cols-3 h-12 p-1 bg-muted/80 border border-border shadow-sm">
+            <TabsTrigger 
+              value="executive" 
+              className="flex items-center gap-2 h-10 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:border data-[state=active]:border-[#8021FF]/30 data-[state=active]:text-[#8021FF] font-medium transition-all"
+            >
               <Calculator className="w-4 h-4" />
               Executive View
             </TabsTrigger>
-            <TabsTrigger value="geography" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="geography" 
+              className="flex items-center gap-2 h-10 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:border data-[state=active]:border-[#8021FF]/30 data-[state=active]:text-[#8021FF] font-medium transition-all"
+            >
               <Globe className="w-4 h-4" />
-              Regional Market Dossier
+              Regional Dossier
+            </TabsTrigger>
+            <TabsTrigger 
+              value="demand" 
+              className="flex items-center gap-2 h-10 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:border data-[state=active]:border-[#8021FF]/30 data-[state=active]:text-[#8021FF] font-medium transition-all"
+            >
+              <Target className="w-4 h-4" />
+              Demand Audit
             </TabsTrigger>
           </TabsList>
 
@@ -1090,26 +1416,28 @@ export default function RecoveryCalculatorPage() {
                 <p className="text-[#8021FF] font-semibold">+{calculations.shift}% direct capture</p>
               </Card>
 
-              {/* Right Card: Net Savings Model */}
-              <Card className="p-6 border border-border">
-                <div className="flex items-center gap-2 mb-4">
-                  <Percent className="w-4 h-4 text-[#8021FF]" />
-                  <span className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Net Savings Model</span>
+              {/* Right Card: Net Savings Model - Premium */}
+              <Card className="p-6 border border-border border-t-4 border-t-[#8021FF] shadow-sm">
+                <div className="flex items-center gap-2 mb-5">
+                  <div className="w-8 h-8 bg-[#8021FF]/10 rounded-lg flex items-center justify-center">
+                    <Percent className="w-4 h-4 text-[#8021FF]" />
+                  </div>
+                  <span className="text-sm font-semibold text-foreground uppercase tracking-wide">Net Savings Model</span>
                 </div>
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
+                <div className="space-y-3 mb-5">
+                  <div className="flex justify-between items-center py-2">
                     <span className="text-muted-foreground">OTA commission</span>
-                    <span className="font-medium text-foreground">{otaCommission}.0%</span>
+                    <span className="font-semibold text-foreground text-lg">{otaCommission}.0%</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between items-center py-2">
                     <span className="text-muted-foreground">Less RG Pay fee</span>
-                    <span className="font-medium text-foreground">−{rgPayFee}%</span>
+                    <span className="font-semibold text-red-500 text-lg">−{rgPayFee}%</span>
                   </div>
                 </div>
-                <div className="pt-3 border-t border-border">
+                <div className="pt-4 border-t-2 border-[#8021FF]/20 bg-[#8021FF]/5 -mx-6 px-6 -mb-6 pb-6 rounded-b-lg">
                   <div className="flex justify-between items-center">
-                    <span className="font-semibold text-foreground">Net savings</span>
-                    <span className="text-2xl font-bold text-[#8021FF]">{calculations.netSavingsPercent.toFixed(1)}%</span>
+                    <span className="font-bold text-foreground">Net savings</span>
+                    <span className="text-3xl font-bold text-[#8021FF]">{calculations.netSavingsPercent.toFixed(1)}%</span>
                   </div>
                 </div>
               </Card>
@@ -1212,15 +1540,15 @@ export default function RecoveryCalculatorPage() {
               </Card>
             </div>
 
-            {/* COLLAPSIBLE SECTIONS (Default Closed) */}
+            {/* COLLAPSIBLE SECTIONS (Default Closed) - Polished */}
             <Accordion type="multiple" className="space-y-4">
-              <AccordionItem value="checkout" className="border border-border rounded-lg px-6">
-                <AccordionTrigger className="text-foreground hover:no-underline">
+              <AccordionItem value="checkout" className="border border-border rounded-lg px-6 shadow-sm hover:shadow-md transition-shadow bg-card">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 [&>svg]:w-5 [&>svg]:h-5 [&>svg]:text-[#8021FF] [&>svg]:transition-transform">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#8021FF]/10 rounded-lg flex items-center justify-center">
-                      <Building2 className="w-4 h-4 text-[#8021FF]" />
+                    <div className="w-9 h-9 bg-[#8021FF] rounded-lg flex items-center justify-center shadow-sm">
+                      <Building2 className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-semibold">Checkout Assumptions</span>
+                    <span className="font-semibold text-base">Checkout Assumptions</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pt-4 pb-6">
@@ -1245,13 +1573,13 @@ export default function RecoveryCalculatorPage() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="revenue" className="border border-border rounded-lg px-6">
-                <AccordionTrigger className="text-foreground hover:no-underline">
+              <AccordionItem value="revenue" className="border border-border rounded-lg px-6 shadow-sm hover:shadow-md transition-shadow bg-card">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 [&>svg]:w-5 [&>svg]:h-5 [&>svg]:text-[#8021FF] [&>svg]:transition-transform">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#8021FF]/10 rounded-lg flex items-center justify-center">
-                      <TrendingUp className="w-4 h-4 text-[#8021FF]" />
+                    <div className="w-9 h-9 bg-[#8021FF] rounded-lg flex items-center justify-center shadow-sm">
+                      <TrendingUp className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-semibold">Revenue & Cost Model</span>
+                    <span className="font-semibold text-base">Revenue & Cost Model</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pt-4 pb-6">
@@ -1276,13 +1604,13 @@ export default function RecoveryCalculatorPage() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="output" className="border border-border rounded-lg px-6">
-                <AccordionTrigger className="text-foreground hover:no-underline">
+              <AccordionItem value="output" className="border border-border rounded-lg px-6 shadow-sm hover:shadow-md transition-shadow bg-card">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 [&>svg]:w-5 [&>svg]:h-5 [&>svg]:text-[#8021FF] [&>svg]:transition-transform">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#8021FF]/10 rounded-lg flex items-center justify-center">
-                      <Calculator className="w-4 h-4 text-[#8021FF]" />
+                    <div className="w-9 h-9 bg-[#8021FF] rounded-lg flex items-center justify-center shadow-sm">
+                      <Calculator className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-semibold">Output / Impact Formulas</span>
+                    <span className="font-semibold text-base">Output / Impact Formulas</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pt-4 pb-6">
@@ -1326,6 +1654,13 @@ export default function RecoveryCalculatorPage() {
           {/* ================================================================ */}
           <TabsContent value="geography" className="mt-8">
             <RegionalMarketDossier />
+          </TabsContent>
+
+          {/* ================================================================ */}
+          {/* DEMAND AUDIT (Tab 3) */}
+          {/* ================================================================ */}
+          <TabsContent value="demand" className="mt-8">
+            <DemandAudit onSwitchToExecutive={() => setActiveTab("executive")} />
           </TabsContent>
         </Tabs>
       </main>
