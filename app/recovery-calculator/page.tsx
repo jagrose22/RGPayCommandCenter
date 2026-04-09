@@ -174,6 +174,641 @@ function formatCurrencyRegion(value: number, region: string): string {
 }
 
 // ============================================================================
+// REGIONAL MARKET DOSSIER DATA
+// ============================================================================
+type MarketKey = "india" | "china" | "brazil" | "indonesia"
+
+interface MarketData {
+  code: string
+  name: string
+  tag: string
+  tagColor: string
+  conversionUpside: string
+  tagline: string
+  benchmarks: {
+    digitalPayment: number
+    railShare: number
+    railName: string
+    mobileBooking: number
+    abandonment: number
+  }
+  heroAmount: string
+  heroContext: string
+  whyItMatters: string
+  paymentRails: Array<{
+    name: string
+    priority: "Critical" | "High" | "Medium"
+    priorityColor: string
+    description: string
+  }>
+  railAdoption: Array<{ name: string; percent: number }>
+  hotelsMiss: string[]
+  winningLooksLike: {
+    features: string[]
+    coverageGap: Array<{ metric: string; bestInClass: number; typical: number }>
+  }
+  rgPayAdvantage: {
+    without: string[]
+    with: string[]
+    callout: string
+  }
+}
+
+const MARKET_DOSSIER_DATA: Record<MarketKey, MarketData> = {
+  india: {
+    code: "IN",
+    name: "India",
+    tag: "High-growth",
+    tagColor: "bg-purple-100 text-purple-700",
+    conversionUpside: "+18–23% conversion upside",
+    tagline: "UPI-first market with strong wallet and affordability expectations",
+    benchmarks: {
+      digitalPayment: 87,
+      railShare: 62,
+      railName: "UPI rail share of transactions",
+      mobileBooking: 71,
+      abandonment: 34
+    },
+    heroAmount: "$3.8M",
+    heroContext: "Based on avg 450-room property at 68% occupancy",
+    whyItMatters: "India's outbound and domestic hotel traveler base overwhelmingly prefers UPI and digital wallet checkout. Properties that offer card-only flows encounter friction at the payment step that directly suppresses booking completions. Affordability features like EMI and BNPL have become conversion drivers, not differentiators — properties without them are invisible to a large qualified segment.",
+    paymentRails: [
+      { name: "UPI", priority: "Critical", priorityColor: "text-red-600", description: "Must-have at checkout" },
+      { name: "Wallets (Paytm, PhonePe)", priority: "High", priorityColor: "text-orange-600", description: "Expected, not optional" },
+      { name: "Credit / debit card", priority: "Medium", priorityColor: "text-green-600", description: "Supported, not primary" },
+      { name: "EMI", priority: "High", priorityColor: "text-orange-600", description: "Conversion driver" },
+      { name: "BNPL", priority: "Medium", priorityColor: "text-green-600", description: "Upsell opportunity" }
+    ],
+    railAdoption: [
+      { name: "UPI", percent: 88 },
+      { name: "Wallets (Paytm, PhonePe)", percent: 64 },
+      { name: "Credit / debit card", percent: 38 },
+      { name: "EMI", percent: 52 },
+      { name: "BNPL", percent: 29 }
+    ],
+    hotelsMiss: [
+      "No UPI support",
+      "Poor wallet coverage",
+      "No EMI / affordability",
+      "Slow payment handoff",
+      "Missing local rails",
+      "Card-only checkout"
+    ],
+    winningLooksLike: {
+      features: [
+        "Full UPI coverage",
+        "Wallet support (Paytm, PhonePe)",
+        "EMI / affordability options",
+        "Localized payment rails",
+        "Fast confirmation flow",
+        "Rupee-native pricing"
+      ],
+      coverageGap: [
+        { metric: "UPI coverage", bestInClass: 92, typical: 18 },
+        { metric: "Wallet support", bestInClass: 78, typical: 12 },
+        { metric: "EMI availability", bestInClass: 70, typical: 8 },
+        { metric: "Affordability options", bestInClass: 65, typical: 5 }
+      ]
+    },
+    rgPayAdvantage: {
+      without: [
+        "4 local vendor contracts",
+        "4 mapping/integration efforts",
+        "4 compliance workflows",
+        "Ongoing maintenance per rail"
+      ],
+      with: [
+        "1 contract",
+        "1 integration",
+        "Full India rail coverage",
+        "Compliance handled centrally"
+      ],
+      callout: "One contract. One integration. Full India coverage — with RG Pay handling compliance, mapping, and ongoing maintenance across all local rails."
+    }
+  },
+  china: {
+    code: "CN",
+    name: "China",
+    tag: "Super-app dominant",
+    tagColor: "bg-blue-100 text-blue-700",
+    conversionUpside: "+22–28% conversion upside",
+    tagline: "Super-app ecosystem where Alipay and WeChat Pay are non-negotiable",
+    benchmarks: {
+      digitalPayment: 94,
+      railShare: 78,
+      railName: "Super-app share of transactions",
+      mobileBooking: 86,
+      abandonment: 41
+    },
+    heroAmount: "$5.1M",
+    heroContext: "Based on avg 450-room property at 68% occupancy",
+    whyItMatters: "Chinese travelers expect seamless Alipay and WeChat Pay integration at every touchpoint. Properties without super-app support are essentially invisible to this high-value segment. Cross-border payment capabilities and UnionPay acceptance are baseline requirements, not competitive advantages.",
+    paymentRails: [
+      { name: "Alipay", priority: "Critical", priorityColor: "text-red-600", description: "Non-negotiable for Chinese guests" },
+      { name: "WeChat Pay", priority: "Critical", priorityColor: "text-red-600", description: "Expected everywhere" },
+      { name: "UnionPay", priority: "High", priorityColor: "text-orange-600", description: "Card backup required" },
+      { name: "Credit card", priority: "Medium", priorityColor: "text-green-600", description: "Secondary option" },
+      { name: "Cross-border QR", priority: "High", priorityColor: "text-orange-600", description: "Outbound essential" }
+    ],
+    railAdoption: [
+      { name: "Alipay", percent: 82 },
+      { name: "WeChat Pay", percent: 79 },
+      { name: "UnionPay", percent: 56 },
+      { name: "Credit card", percent: 34 },
+      { name: "Cross-border QR", percent: 61 }
+    ],
+    hotelsMiss: [
+      "No Alipay support",
+      "Missing WeChat Pay",
+      "No UnionPay acceptance",
+      "USD-only pricing",
+      "No cross-border QR",
+      "Slow settlement"
+    ],
+    winningLooksLike: {
+      features: [
+        "Full Alipay integration",
+        "WeChat Pay native",
+        "UnionPay acceptance",
+        "RMB pricing display",
+        "Cross-border QR codes",
+        "Instant confirmation"
+      ],
+      coverageGap: [
+        { metric: "Alipay coverage", bestInClass: 95, typical: 22 },
+        { metric: "WeChat Pay", bestInClass: 92, typical: 18 },
+        { metric: "UnionPay", bestInClass: 85, typical: 35 },
+        { metric: "Cross-border QR", bestInClass: 78, typical: 12 }
+      ]
+    },
+    rgPayAdvantage: {
+      without: [
+        "Separate Alipay contract",
+        "WeChat Pay integration",
+        "UnionPay gateway setup",
+        "Cross-border compliance"
+      ],
+      with: [
+        "1 contract",
+        "1 integration",
+        "Full China coverage",
+        "Cross-border handled"
+      ],
+      callout: "One contract. One integration. Full China super-app coverage — with RG Pay handling cross-border compliance and settlement across all rails."
+    }
+  },
+  brazil: {
+    code: "BR",
+    name: "Brazil",
+    tag: "Installment-first",
+    tagColor: "bg-green-100 text-green-700",
+    conversionUpside: "+15–20% conversion upside",
+    tagline: "Pix-dominant market with strong installment (parcelado) culture",
+    benchmarks: {
+      digitalPayment: 79,
+      railShare: 71,
+      railName: "Pix share of transactions",
+      mobileBooking: 64,
+      abandonment: 38
+    },
+    heroAmount: "$2.9M",
+    heroContext: "Based on avg 450-room property at 68% occupancy",
+    whyItMatters: "Brazilian consumers expect Pix as the default payment option — it's instant, free, and ubiquitous. The installment culture (parcelado) means properties without 6-12 month payment plans lose bookings to OTAs that offer them. Boleto remains relevant for cash-preferred segments.",
+    paymentRails: [
+      { name: "Pix", priority: "Critical", priorityColor: "text-red-600", description: "Default payment method" },
+      { name: "Credit card (parcelado)", priority: "Critical", priorityColor: "text-red-600", description: "Installments expected" },
+      { name: "Boleto", priority: "Medium", priorityColor: "text-green-600", description: "Cash segment coverage" },
+      { name: "Debit card", priority: "Medium", priorityColor: "text-green-600", description: "Growing adoption" },
+      { name: "Digital wallets", priority: "High", priorityColor: "text-orange-600", description: "Mercado Pago, PicPay" }
+    ],
+    railAdoption: [
+      { name: "Pix", percent: 85 },
+      { name: "Credit card (parcelado)", percent: 72 },
+      { name: "Boleto", percent: 31 },
+      { name: "Debit card", percent: 44 },
+      { name: "Digital wallets", percent: 38 }
+    ],
+    hotelsMiss: [
+      "No Pix support",
+      "No installment options",
+      "Missing Boleto",
+      "USD-only pricing",
+      "No local wallets",
+      "Single payment only"
+    ],
+    winningLooksLike: {
+      features: [
+        "Full Pix integration",
+        "6-12 month parcelado",
+        "Boleto generation",
+        "BRL-native pricing",
+        "Mercado Pago support",
+        "Instant Pix confirmation"
+      ],
+      coverageGap: [
+        { metric: "Pix coverage", bestInClass: 94, typical: 25 },
+        { metric: "Parcelado options", bestInClass: 88, typical: 15 },
+        { metric: "Boleto support", bestInClass: 72, typical: 8 },
+        { metric: "Local wallets", bestInClass: 65, typical: 10 }
+      ]
+    },
+    rgPayAdvantage: {
+      without: [
+        "Pix gateway contract",
+        "Parcelado acquirer setup",
+        "Boleto integration",
+        "BRL settlement complexity"
+      ],
+      with: [
+        "1 contract",
+        "1 integration",
+        "Full Brazil coverage",
+        "BRL settlement included"
+      ],
+      callout: "One contract. One integration. Full Brazil coverage — with RG Pay handling Pix, parcelado, and Boleto across all properties."
+    }
+  },
+  indonesia: {
+    code: "ID",
+    name: "Indonesia",
+    tag: "Emerging digital",
+    tagColor: "bg-amber-100 text-amber-700",
+    conversionUpside: "+12–17% conversion upside",
+    tagline: "Fast-growing digital payments with strong e-wallet adoption",
+    benchmarks: {
+      digitalPayment: 68,
+      railShare: 54,
+      railName: "E-wallet share of transactions",
+      mobileBooking: 72,
+      abandonment: 42
+    },
+    heroAmount: "$2.1M",
+    heroContext: "Based on avg 450-room property at 68% occupancy",
+    whyItMatters: "Indonesia's payment landscape is fragmenting across GoPay, OVO, Dana, and ShopeePay. Properties that support only cards miss the majority of domestic travelers. Bank transfer (virtual account) remains critical for higher-value bookings where travelers prefer traditional rails.",
+    paymentRails: [
+      { name: "GoPay", priority: "Critical", priorityColor: "text-red-600", description: "Largest e-wallet" },
+      { name: "OVO", priority: "High", priorityColor: "text-orange-600", description: "Strong retail presence" },
+      { name: "Dana", priority: "High", priorityColor: "text-orange-600", description: "Growing adoption" },
+      { name: "Virtual Account", priority: "High", priorityColor: "text-orange-600", description: "Bank transfer coverage" },
+      { name: "Credit card", priority: "Medium", priorityColor: "text-green-600", description: "International guests" }
+    ],
+    railAdoption: [
+      { name: "GoPay", percent: 62 },
+      { name: "OVO", percent: 58 },
+      { name: "Dana", percent: 45 },
+      { name: "Virtual Account", percent: 52 },
+      { name: "Credit card", percent: 28 }
+    ],
+    hotelsMiss: [
+      "No GoPay support",
+      "Missing OVO/Dana",
+      "No virtual account",
+      "USD-only pricing",
+      "Card-only checkout",
+      "Slow confirmation"
+    ],
+    winningLooksLike: {
+      features: [
+        "Full GoPay integration",
+        "OVO and Dana support",
+        "Virtual Account coverage",
+        "IDR-native pricing",
+        "ShopeePay acceptance",
+        "Instant confirmation"
+      ],
+      coverageGap: [
+        { metric: "GoPay coverage", bestInClass: 85, typical: 15 },
+        { metric: "OVO support", bestInClass: 80, typical: 12 },
+        { metric: "Virtual Account", bestInClass: 75, typical: 20 },
+        { metric: "Multi-wallet", bestInClass: 70, typical: 8 }
+      ]
+    },
+    rgPayAdvantage: {
+      without: [
+        "GoPay contract",
+        "OVO integration",
+        "Dana setup",
+        "VA bank connections"
+      ],
+      with: [
+        "1 contract",
+        "1 integration",
+        "Full Indonesia coverage",
+        "All e-wallets included"
+      ],
+      callout: "One contract. One integration. Full Indonesia coverage — with RG Pay handling GoPay, OVO, Dana, and virtual accounts across all properties."
+    }
+  }
+}
+
+// ============================================================================
+// REGIONAL MARKET DOSSIER COMPONENT
+// ============================================================================
+function RegionalMarketDossier() {
+  const [selectedMarket, setSelectedMarket] = useState<MarketKey>("india")
+  const [activeSection, setActiveSection] = useState("why")
+  
+  const market = MARKET_DOSSIER_DATA[selectedMarket]
+  const markets: MarketKey[] = ["india", "china", "brazil", "indonesia"]
+  
+  const sectionTabs = [
+    { id: "why", label: "Why it matters" },
+    { id: "rails", label: "Payment rails" },
+    { id: "miss", label: "What hotels miss" },
+    { id: "winning", label: "What winning looks like" },
+    { id: "advantage", label: "RG Pay advantage" }
+  ]
+
+  return (
+    <div className="space-y-6">
+      {/* Hero Banner */}
+      <div className="bg-[#8021FF] rounded-xl p-6 flex items-center justify-between">
+        <div className="text-white">
+          <p className="text-lg font-semibold">One global contract. Four high-growth markets.</p>
+          <p className="text-white/80">Localized checkout confidence everywhere.</p>
+        </div>
+        <span className="px-4 py-2 bg-white/20 rounded-full text-white text-sm font-medium">
+          Market intelligence layer
+        </span>
+      </div>
+
+      {/* Main Layout: Sidebar + Content */}
+      <div className="flex gap-6">
+        {/* Left Sidebar - Market Selection */}
+        <div className="w-56 shrink-0">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Select Market</p>
+          <div className="space-y-2">
+            {markets.map((key) => {
+              const m = MARKET_DOSSIER_DATA[key]
+              const isSelected = selectedMarket === key
+              return (
+                <button
+                  key={key}
+                  onClick={() => setSelectedMarket(key)}
+                  className={`w-full text-left p-4 rounded-lg border transition-all duration-150 ${
+                    isSelected 
+                      ? "border-[#8021FF] bg-[#8021FF]/5 shadow-sm" 
+                      : "border-border hover:border-[#8021FF]/50 hover:bg-[#8021FF]/5"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-mono text-muted-foreground">{m.code}</span>
+                    <span className="font-semibold text-foreground">{m.name}</span>
+                  </div>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${m.tagColor}`}>
+                    {m.tag}
+                  </span>
+                  <p className="text-xs text-[#8021FF] font-medium mt-2">{m.conversionUpside}</p>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Right Content Area */}
+        <div className="flex-1 space-y-6">
+          {/* Market Header */}
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-sm font-mono text-muted-foreground">{market.code}</span>
+              <h2 className="text-2xl font-bold text-foreground">{market.name}</h2>
+            </div>
+            <p className="text-muted-foreground">{market.tagline}</p>
+          </div>
+
+          {/* Benchmark Tiles */}
+          <div className="grid grid-cols-4 gap-4">
+            <Card className="p-4 border border-border bg-muted/30">
+              <p className="text-3xl font-bold text-foreground mb-1">{market.benchmarks.digitalPayment}%</p>
+              <p className="text-xs text-muted-foreground">Digital payment adoption</p>
+            </Card>
+            <Card className="p-4 border border-border bg-muted/30">
+              <p className="text-3xl font-bold text-foreground mb-1">{market.benchmarks.railShare}%</p>
+              <p className="text-xs text-muted-foreground">{market.benchmarks.railName}</p>
+            </Card>
+            <Card className="p-4 border border-border bg-muted/30">
+              <p className="text-3xl font-bold text-foreground mb-1">{market.benchmarks.mobileBooking}%</p>
+              <p className="text-xs text-muted-foreground">Mobile-first booking share</p>
+            </Card>
+            <Card className="p-4 border border-border bg-muted/30">
+              <p className="text-3xl font-bold text-foreground mb-1">{market.benchmarks.abandonment}%</p>
+              <p className="text-xs text-muted-foreground">Checkout abandonment benchmark</p>
+            </Card>
+          </div>
+
+          {/* Hero Commercial Card */}
+          <Card className="p-6 border border-border bg-[#8021FF]/5">
+            <div className="flex items-baseline gap-4">
+              <div>
+                <p className="text-4xl font-bold text-[#8021FF]">{market.heroAmount}</p>
+                <p className="text-sm text-muted-foreground mt-1">Annual direct revenue opportunity at full rail coverage</p>
+              </div>
+              <p className="text-xs text-muted-foreground italic ml-auto">{market.heroContext}</p>
+            </div>
+          </Card>
+
+          {/* Section Indicator */}
+          <div className="w-1 h-6 bg-[#8021FF] rounded-full" />
+
+          {/* Section Tabs */}
+          <div className="flex gap-2 border-b border-border pb-0">
+            {sectionTabs.map((tab) => {
+              const isActive = activeSection === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveSection(tab.id)}
+                  className={`px-4 py-3 text-sm font-medium transition-all duration-150 rounded-t-lg border-b-2 -mb-px ${
+                    isActive 
+                      ? "bg-[#8021FF]/10 border-[#8021FF] text-foreground font-semibold shadow-sm" 
+                      : "border-transparent text-muted-foreground hover:bg-[#8021FF]/5 hover:text-foreground"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Section Content */}
+          <div className="min-h-[300px]">
+            {/* Why It Matters */}
+            {activeSection === "why" && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                  Section 1 — Why this market matters
+                </p>
+                <Card className="p-6 border border-border">
+                  <p className="text-foreground leading-relaxed">{market.whyItMatters}</p>
+                </Card>
+              </div>
+            )}
+
+            {/* Payment Rails */}
+            {activeSection === "rails" && (
+              <div className="space-y-6">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Section 2 — Local payment expectations
+                </p>
+                
+                {/* Rail Priority Cards */}
+                <div className="grid grid-cols-5 gap-3">
+                  {market.paymentRails.map((rail) => (
+                    <Card key={rail.name} className="p-4 border border-border text-center">
+                      <p className="font-semibold text-foreground text-sm mb-1">{rail.name}</p>
+                      <p className={`text-xs font-medium ${rail.priorityColor}`}>{rail.priority}</p>
+                      <p className="text-xs text-muted-foreground mt-2">{rail.description}</p>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Rail Adoption Chart */}
+                <Card className="p-6 border border-border">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">
+                    Payment rail adoption benchmark
+                  </p>
+                  <div className="space-y-4">
+                    {market.railAdoption.map((rail) => (
+                      <div key={rail.name} className="flex items-center gap-4">
+                        <span className="text-sm text-foreground w-40 shrink-0">{rail.name}</span>
+                        <div className="flex-1 h-6 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-[#8021FF] rounded-full transition-all duration-500"
+                            style={{ width: `${rail.percent}%` }}
+                          />
+                        </div>
+                        <span className="text-sm font-medium text-foreground w-12 text-right">{rail.percent}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+            )}
+
+            {/* What Hotels Miss */}
+            {activeSection === "miss" && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                  Section 3 — What hotels often miss
+                </p>
+                <Card className="p-6 border border-border">
+                  <div className="grid grid-cols-2 gap-4">
+                    {market.hotelsMiss.map((item) => (
+                      <div key={item} className="flex items-center gap-3">
+                        <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
+                        <span className="text-foreground">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+            )}
+
+            {/* What Winning Looks Like */}
+            {activeSection === "winning" && (
+              <div className="space-y-6">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Section 4 — What winning looks like
+                </p>
+                
+                <Card className="p-6 border border-border">
+                  <p className="text-sm text-muted-foreground mb-4">Best-in-class checkout in {market.name} includes:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {market.winningLooksLike.features.map((feature) => (
+                      <span key={feature} className="px-3 py-1.5 bg-muted rounded-full text-sm text-foreground border border-border">
+                        {feature}
+                      </span>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Coverage Gap Chart */}
+                <Card className="p-6 border border-border">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-4">
+                    Gold standard vs. typical hotel — coverage gap
+                  </p>
+                  <div className="space-y-6">
+                    {market.winningLooksLike.coverageGap.map((item) => (
+                      <div key={item.metric}>
+                        <p className="text-sm font-medium text-foreground mb-2">{item.metric}</p>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs text-muted-foreground w-16">Best-in-class</span>
+                            <div className="flex-1 h-4 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-green-500 rounded-full"
+                                style={{ width: `${item.bestInClass}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium text-foreground w-10 text-right">{item.bestInClass}%</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs text-muted-foreground w-16">Typical hotel</span>
+                            <div className="flex-1 h-4 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-red-500 rounded-full"
+                                style={{ width: `${item.typical}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium text-foreground w-10 text-right">{item.typical}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+            )}
+
+            {/* RG Pay Advantage */}
+            {activeSection === "advantage" && (
+              <div className="space-y-6">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Section 5 — RG Pay advantage
+                </p>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Without RG Pay */}
+                  <Card className="p-6 border border-border bg-red-50">
+                    <p className="text-sm font-semibold text-red-700 uppercase tracking-wide mb-4">Without RG Pay</p>
+                    <div className="space-y-3">
+                      {market.rgPayAdvantage.without.map((item) => (
+                        <div key={item} className="flex items-start gap-2">
+                          <span className="text-muted-foreground">—</span>
+                          <span className="text-foreground text-sm">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+
+                  {/* With RG Pay */}
+                  <Card className="p-6 border border-border bg-green-50">
+                    <p className="text-sm font-semibold text-green-700 uppercase tracking-wide mb-4">With RG Pay</p>
+                    <div className="space-y-3">
+                      {market.rgPayAdvantage.with.map((item) => (
+                        <div key={item} className="flex items-start gap-2">
+                          <span className="text-green-600">+</span>
+                          <span className="text-foreground text-sm">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Callout */}
+                <Card className="p-5 border-l-4 border-l-[#8021FF] border border-border bg-[#8021FF]/5">
+                  <p className="text-foreground">{market.rgPayAdvantage.callout}</p>
+                </Card>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 export default function RecoveryCalculatorPage() {
@@ -309,7 +944,7 @@ export default function RecoveryCalculatorPage() {
             </TabsTrigger>
             <TabsTrigger value="geography" className="flex items-center gap-2">
               <Globe className="w-4 h-4" />
-              Geography View
+              Regional Market Dossier
             </TabsTrigger>
           </TabsList>
 
@@ -624,7 +1259,7 @@ export default function RecoveryCalculatorPage() {
                   className="bg-[#8021FF] hover:bg-[#6B1AD6] text-white shrink-0"
                   onClick={() => setActiveTab("geography")}
                 >
-                  Launch regional market playbook
+                  Explore regional market dossier
                   <ArrowUpRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
@@ -632,152 +1267,10 @@ export default function RecoveryCalculatorPage() {
           </TabsContent>
 
           {/* ================================================================ */}
-          {/* GEOGRAPHY VIEW (Preserved from V2) */}
+          {/* REGIONAL MARKET DOSSIER (Tab 2) */}
           {/* ================================================================ */}
           <TabsContent value="geography" className="mt-8">
-            <div className="space-y-8">
-              {/* Region Cards Grid */}
-              <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
-                {geographyData.map((geo) => (
-                  <Card 
-                    key={geo.region}
-                    className={`p-5 border transition-all cursor-pointer ${
-                      selectedRegion === geo.region 
-                        ? "border-[#8021FF] ring-2 ring-[#8021FF]/20 bg-[#8021FF]/5" 
-                        : "border-border hover:border-[#8021FF]/50"
-                    }`}
-                    onClick={() => {
-                      setSelectedRegion(geo.region)
-                      setActiveTab("executive")
-                    }}
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="font-semibold text-foreground text-sm">{geo.region}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        geo.recoverySpeed === "Fast" 
-                          ? "bg-green-100 text-green-700" 
-                          : geo.recoverySpeed === "Medium"
-                          ? "bg-amber-100 text-amber-700"
-                          : "bg-gray-100 text-gray-700"
-                      }`}>
-                        {geo.recoverySpeed}
-                      </span>
-                    </div>
-                    
-                    <div className="space-y-2 mb-4">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Alt Pay %</span>
-                        <span className="font-medium text-foreground">{geo.altPayPercent}%</span>
-                      </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Retry %</span>
-                        <span className="font-medium text-foreground">{geo.retryPercent}%</span>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-3 border-t border-border">
-                      <p className="text-xs text-muted-foreground mb-1">Recovery Opportunity</p>
-                      <p className="text-lg font-bold text-[#8021FF]">
-                        {geo.currencySymbol}{(geo.totalAnnualRecovery * (
-                          geo.currency === "INR" ? 83 :
-                          geo.currency === "EUR" ? 0.92 :
-                          geo.currency === "BRL" ? 4.97 :
-                          geo.currency === "AED" ? 3.67 : 1
-                        ) / 1000000).toFixed(1)}M
-                      </p>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-
-              {/* Selected Region Detail */}
-              <Card className="p-6 border border-border">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#8021FF]/10 rounded-lg flex items-center justify-center">
-                      <Globe className="w-5 h-5 text-[#8021FF]" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">{selectedRegion} Market Details</h3>
-                      <p className="text-sm text-muted-foreground">Regional payment characteristics</p>
-                    </div>
-                  </div>
-                  <span className={`text-sm px-3 py-1 rounded-full font-medium ${
-                    regionConfig?.recoverySpeed === "Fast" 
-                      ? "bg-green-100 text-green-700" 
-                      : regionConfig?.recoverySpeed === "Medium"
-                      ? "bg-amber-100 text-amber-700"
-                      : "bg-gray-100 text-gray-700"
-                  }`}>
-                    <Clock className="w-3 h-3 inline mr-1" />
-                    {regionConfig?.recoverySpeed} Recovery
-                  </span>
-                </div>
-                
-                <div className="grid md:grid-cols-4 gap-6">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Primary Payment Method</p>
-                    <p className="font-semibold text-foreground">{regionConfig?.primaryPayment}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Card Penetration</p>
-                    <p className="font-semibold text-foreground">{regionConfig?.cardPenetration}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Currency</p>
-                    <p className="font-semibold text-foreground">{regionConfig?.currency} ({regionConfig?.currencySymbol})</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Default Payment Gap</p>
-                    <p className="font-semibold text-foreground">{regionConfig?.defaultPaymentGap}%</p>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Priority Table */}
-              <Card className="p-6 border border-border">
-                <h4 className="font-semibold text-foreground mb-4">Regional Priority Ranking</h4>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left py-3 font-medium text-muted-foreground">Region</th>
-                        <th className="text-left py-3 font-medium text-muted-foreground">Recovery Speed</th>
-                        <th className="text-left py-3 font-medium text-muted-foreground">Alt Pay %</th>
-                        <th className="text-left py-3 font-medium text-muted-foreground">Primary Method</th>
-                        <th className="text-right py-3 font-medium text-muted-foreground">Opportunity</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {geographyData.map((geo, idx) => (
-                        <tr key={geo.region} className="border-b border-border last:border-0">
-                          <td className="py-3 font-medium text-foreground">
-                            <span className="text-[#8021FF] mr-2">#{idx + 1}</span>
-                            {geo.region}
-                          </td>
-                          <td className="py-3">
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                              geo.recoverySpeed === "Fast" 
-                                ? "bg-green-100 text-green-700" 
-                                : geo.recoverySpeed === "Medium"
-                                ? "bg-amber-100 text-amber-700"
-                                : "bg-gray-100 text-gray-700"
-                            }`}>
-                              {geo.recoverySpeed}
-                            </span>
-                          </td>
-                          <td className="py-3 text-foreground">{geo.altPayPercent}%</td>
-                          <td className="py-3 text-muted-foreground">{geo.primaryPayment}</td>
-                          <td className="py-3 text-right font-semibold text-[#8021FF]">
-                            {formatCurrencyRegion(geo.totalAnnualRecovery, geo.region)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            </div>
+            <RegionalMarketDossier />
           </TabsContent>
         </Tabs>
       </main>
