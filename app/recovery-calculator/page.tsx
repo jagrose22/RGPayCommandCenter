@@ -935,41 +935,46 @@ export default function RecoveryCalculatorPage() {
           </p>
         </div>
 
-        {/* HERO KPI RIBBON - Value at a Glance */}
-        <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-[#8021FF]/10 via-[#8021FF]/5 to-transparent border border-[#8021FF]/20">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Projected Annual Net Savings</p>
-              <div className="flex items-baseline gap-3">
-                <span className="text-4xl md:text-5xl font-bold text-[#8021FF]">{formatINR(calculations.annualSavingsINR)}</span>
-                <span className="text-lg text-muted-foreground">{formatUSD(calculations.annualSavingsUSD)}</span>
+        {/* COMPACT KPI STRIP - Executive Summary */}
+        <div className="mb-8 px-6 py-4 rounded-xl bg-muted/50 border border-border">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Direct Shift</span>
+                <span className="text-lg font-bold text-[#8021FF]">+{calculations.shift}%</span>
+              </div>
+              <div className="w-px h-6 bg-border" />
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Net Margin</span>
+                <span className="text-lg font-bold text-green-600">{calculations.netSavingsPercent.toFixed(1)}%</span>
+              </div>
+              <div className="w-px h-6 bg-border hidden sm:block" />
+              <div className="flex items-center gap-2 hidden sm:flex">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Monthly</span>
+                <span className="text-lg font-bold text-foreground">{formatINR(calculations.monthlySavingsINR)}</span>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 md:gap-8">
-              <div className="text-center md:text-right">
-                <p className="text-xs text-muted-foreground mb-1">Direct Shift</p>
-                <p className="text-xl font-bold text-foreground">+{calculations.shift}%</p>
-              </div>
-              <div className="text-center md:text-right">
-                <p className="text-xs text-muted-foreground mb-1">Net Margin</p>
-                <p className="text-xl font-bold text-green-600">{calculations.netSavingsPercent.toFixed(1)}%</p>
-              </div>
-              <div className="text-center md:text-right">
-                <p className="text-xs text-muted-foreground mb-1">Monthly</p>
-                <p className="text-xl font-bold text-foreground">{formatINR(calculations.monthlySavingsINR)}</p>
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Annual</span>
+              <span className="text-lg font-bold text-foreground">{formatINR(calculations.annualSavingsINR)}</span>
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs - Enhanced Visibility */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="executive" className="flex items-center gap-2">
+          <TabsList className="grid w-full max-w-lg grid-cols-2 h-12 p-1 bg-muted/80 border border-border shadow-sm">
+            <TabsTrigger 
+              value="executive" 
+              className="flex items-center gap-2 h-10 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:border data-[state=active]:border-[#8021FF]/30 data-[state=active]:text-[#8021FF] font-medium transition-all"
+            >
               <Calculator className="w-4 h-4" />
               Executive View
             </TabsTrigger>
-            <TabsTrigger value="geography" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="geography" 
+              className="flex items-center gap-2 h-10 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:border data-[state=active]:border-[#8021FF]/30 data-[state=active]:text-[#8021FF] font-medium transition-all"
+            >
               <Globe className="w-4 h-4" />
               Regional Market Dossier
             </TabsTrigger>
@@ -1090,26 +1095,28 @@ export default function RecoveryCalculatorPage() {
                 <p className="text-[#8021FF] font-semibold">+{calculations.shift}% direct capture</p>
               </Card>
 
-              {/* Right Card: Net Savings Model */}
-              <Card className="p-6 border border-border">
-                <div className="flex items-center gap-2 mb-4">
-                  <Percent className="w-4 h-4 text-[#8021FF]" />
-                  <span className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Net Savings Model</span>
+              {/* Right Card: Net Savings Model - Premium */}
+              <Card className="p-6 border border-border border-t-4 border-t-[#8021FF] shadow-sm">
+                <div className="flex items-center gap-2 mb-5">
+                  <div className="w-8 h-8 bg-[#8021FF]/10 rounded-lg flex items-center justify-center">
+                    <Percent className="w-4 h-4 text-[#8021FF]" />
+                  </div>
+                  <span className="text-sm font-semibold text-foreground uppercase tracking-wide">Net Savings Model</span>
                 </div>
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
+                <div className="space-y-3 mb-5">
+                  <div className="flex justify-between items-center py-2">
                     <span className="text-muted-foreground">OTA commission</span>
-                    <span className="font-medium text-foreground">{otaCommission}.0%</span>
+                    <span className="font-semibold text-foreground text-lg">{otaCommission}.0%</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between items-center py-2">
                     <span className="text-muted-foreground">Less RG Pay fee</span>
-                    <span className="font-medium text-foreground">−{rgPayFee}%</span>
+                    <span className="font-semibold text-red-500 text-lg">−{rgPayFee}%</span>
                   </div>
                 </div>
-                <div className="pt-3 border-t border-border">
+                <div className="pt-4 border-t-2 border-[#8021FF]/20 bg-[#8021FF]/5 -mx-6 px-6 -mb-6 pb-6 rounded-b-lg">
                   <div className="flex justify-between items-center">
-                    <span className="font-semibold text-foreground">Net savings</span>
-                    <span className="text-2xl font-bold text-[#8021FF]">{calculations.netSavingsPercent.toFixed(1)}%</span>
+                    <span className="font-bold text-foreground">Net savings</span>
+                    <span className="text-3xl font-bold text-[#8021FF]">{calculations.netSavingsPercent.toFixed(1)}%</span>
                   </div>
                 </div>
               </Card>
@@ -1212,15 +1219,15 @@ export default function RecoveryCalculatorPage() {
               </Card>
             </div>
 
-            {/* COLLAPSIBLE SECTIONS (Default Closed) */}
+            {/* COLLAPSIBLE SECTIONS (Default Closed) - Polished */}
             <Accordion type="multiple" className="space-y-4">
-              <AccordionItem value="checkout" className="border border-border rounded-lg px-6">
-                <AccordionTrigger className="text-foreground hover:no-underline">
+              <AccordionItem value="checkout" className="border border-border rounded-lg px-6 shadow-sm hover:shadow-md transition-shadow bg-card">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 [&>svg]:w-5 [&>svg]:h-5 [&>svg]:text-[#8021FF] [&>svg]:transition-transform">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#8021FF]/10 rounded-lg flex items-center justify-center">
-                      <Building2 className="w-4 h-4 text-[#8021FF]" />
+                    <div className="w-9 h-9 bg-[#8021FF] rounded-lg flex items-center justify-center shadow-sm">
+                      <Building2 className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-semibold">Checkout Assumptions</span>
+                    <span className="font-semibold text-base">Checkout Assumptions</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pt-4 pb-6">
@@ -1245,13 +1252,13 @@ export default function RecoveryCalculatorPage() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="revenue" className="border border-border rounded-lg px-6">
-                <AccordionTrigger className="text-foreground hover:no-underline">
+              <AccordionItem value="revenue" className="border border-border rounded-lg px-6 shadow-sm hover:shadow-md transition-shadow bg-card">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 [&>svg]:w-5 [&>svg]:h-5 [&>svg]:text-[#8021FF] [&>svg]:transition-transform">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#8021FF]/10 rounded-lg flex items-center justify-center">
-                      <TrendingUp className="w-4 h-4 text-[#8021FF]" />
+                    <div className="w-9 h-9 bg-[#8021FF] rounded-lg flex items-center justify-center shadow-sm">
+                      <TrendingUp className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-semibold">Revenue & Cost Model</span>
+                    <span className="font-semibold text-base">Revenue & Cost Model</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pt-4 pb-6">
@@ -1276,13 +1283,13 @@ export default function RecoveryCalculatorPage() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="output" className="border border-border rounded-lg px-6">
-                <AccordionTrigger className="text-foreground hover:no-underline">
+              <AccordionItem value="output" className="border border-border rounded-lg px-6 shadow-sm hover:shadow-md transition-shadow bg-card">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 [&>svg]:w-5 [&>svg]:h-5 [&>svg]:text-[#8021FF] [&>svg]:transition-transform">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#8021FF]/10 rounded-lg flex items-center justify-center">
-                      <Calculator className="w-4 h-4 text-[#8021FF]" />
+                    <div className="w-9 h-9 bg-[#8021FF] rounded-lg flex items-center justify-center shadow-sm">
+                      <Calculator className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-semibold">Output / Impact Formulas</span>
+                    <span className="font-semibold text-base">Output / Impact Formulas</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pt-4 pb-6">
