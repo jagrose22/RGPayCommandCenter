@@ -96,7 +96,173 @@ export function GuestJourney({ onNavigateToCalculator }: GuestJourneyProps) {
       </section>
 
       {/* ============================================================ */}
-      {/* SECTION 2: GUEST BOOKING JOURNEY */}
+      {/* SECTION 2: REAL BOOKING EXPERIENCE (NEW HERO VISUAL) */}
+      {/* ============================================================ */}
+      <section>
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-2">What the Guest Sees at Checkout</h2>
+          <p className="text-muted-foreground">The digital moment where bookings are won or lost</p>
+        </div>
+
+        {/* Wide Visual Panel - Modern Checkout Interface */}
+        <div className="max-w-5xl mx-auto">
+          <Card className="relative overflow-hidden border-2 border-border shadow-2xl">
+            {/* Browser Chrome */}
+            <div className="flex items-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-800 border-b border-border">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-400" />
+                <div className="w-3 h-3 rounded-full bg-amber-400" />
+                <div className="w-3 h-3 rounded-full bg-green-400" />
+              </div>
+              <div className="flex-1 mx-4">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-700 rounded-lg text-xs text-muted-foreground">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  secure.marriott.com/checkout
+                </div>
+              </div>
+            </div>
+
+            {/* Checkout Interface */}
+            <div className="grid md:grid-cols-5 min-h-[400px]">
+              {/* Left: Booking Summary */}
+              <div className="md:col-span-2 p-6 bg-gray-50 dark:bg-gray-900 border-r border-border">
+                <div className="space-y-4">
+                  {/* Hotel Image Placeholder */}
+                  <div className="aspect-video bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-12 h-12 mx-auto bg-white/80 rounded-lg flex items-center justify-center mb-2">
+                        <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                      </div>
+                      <span className="text-xs font-medium text-blue-700 dark:text-blue-300">JW Marriott Mumbai</span>
+                    </div>
+                  </div>
+
+                  {/* Booking Details */}
+                  <div className="space-y-3">
+                    <h3 className="font-bold text-foreground">Ocean View Suite</h3>
+                    <div className="space-y-1 text-sm text-muted-foreground">
+                      <p>Dec 15 - Dec 17, 2024</p>
+                      <p>2 Nights, 2 Adults</p>
+                    </div>
+                    <div className="pt-3 border-t border-border">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Room Rate</span>
+                        <span className="text-foreground">₹18,500</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Taxes & Fees</span>
+                        <span className="text-foreground">₹3,330</span>
+                      </div>
+                      <div className="flex justify-between font-bold text-lg mt-2 pt-2 border-t border-border">
+                        <span>Total</span>
+                        <span className="text-[#8021FF]">₹21,830</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Payment Selection */}
+              <div className="md:col-span-3 p-6 bg-white dark:bg-gray-950">
+                <h3 className="text-lg font-bold text-foreground mb-2">Choose Payment Method</h3>
+                <p className="text-sm text-muted-foreground mb-6">Select your preferred way to pay</p>
+
+                {/* Payment Options Grid */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  {/* UPI - Selected/Recommended */}
+                  <div className="relative col-span-2 p-4 bg-[#8021FF]/5 border-2 border-[#8021FF] rounded-xl cursor-pointer hover:bg-[#8021FF]/10 transition-colors">
+                    <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-[#8021FF] text-white text-[10px] font-bold rounded-full">
+                      RECOMMENDED
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center shrink-0">
+                        <span className="text-white font-bold text-sm">UPI</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-foreground">UPI / BHIM</p>
+                        <p className="text-xs text-muted-foreground">GPay, PhonePe, Paytm & more</p>
+                      </div>
+                      <CheckCircle2 className="w-6 h-6 text-[#8021FF]" />
+                    </div>
+                  </div>
+
+                  {/* Wallet */}
+                  <div className="p-4 bg-gray-50 dark:bg-gray-900 border border-border rounded-xl cursor-pointer hover:border-[#8021FF]/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center shrink-0">
+                        <Smartphone className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground text-sm">Wallets</p>
+                        <p className="text-xs text-muted-foreground">PhonePe, Paytm</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cards */}
+                  <div className="p-4 bg-gray-50 dark:bg-gray-900 border border-border rounded-xl cursor-pointer hover:border-[#8021FF]/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center shrink-0">
+                        <CreditCard className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground text-sm">Card</p>
+                        <p className="text-xs text-muted-foreground">Visa, Mastercard</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* BNPL */}
+                  <div className="p-4 bg-gray-50 dark:bg-gray-900 border border-border rounded-xl cursor-pointer hover:border-[#8021FF]/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center shrink-0">
+                        <Gift className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground text-sm">Pay Later</p>
+                        <p className="text-xs text-muted-foreground">LazyPay, Simpl</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Net Banking */}
+                  <div className="p-4 bg-gray-50 dark:bg-gray-900 border border-border rounded-xl cursor-pointer hover:border-[#8021FF]/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center shrink-0">
+                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground text-sm">Net Banking</p>
+                        <p className="text-xs text-muted-foreground">All major banks</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* RG Pay Badge */}
+                <div className="flex items-center justify-center gap-2 py-3 px-4 bg-[#8021FF]/5 border border-[#8021FF]/20 rounded-lg mb-6">
+                  <Zap className="w-4 h-4 text-[#8021FF]" />
+                  <span className="text-xs font-medium text-[#8021FF]">Preferred method surfaced by RG Pay</span>
+                </div>
+
+                {/* Pay Button */}
+                <Button className="w-full h-14 bg-[#8021FF] hover:bg-[#6B1AD6] text-white text-lg font-bold shadow-lg shadow-[#8021FF]/25">
+                  Pay ₹21,830 with UPI
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* SECTION 3: GUEST BOOKING JOURNEY */}
       {/* ============================================================ */}
       <section>
         <div className="text-center mb-8">
