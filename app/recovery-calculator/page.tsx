@@ -826,6 +826,9 @@ interface TerritoryBenchmark {
   average: number[]   // Market average
   otas: OTAData[]     // OTA-specific data
   riskCallout: string // Territory-specific risk statement
+  conversionUpside: string // e.g., "+18–23%"
+  revenueRecoveryINR: string // Local currency estimate
+  revenueRecoveryUSD: string // USD estimate
 }
 
 const DEMAND_AUDIT_DATA: Record<DemandTerritoryKey, TerritoryBenchmark> = {
@@ -841,7 +844,10 @@ const DEMAND_AUDIT_DATA: Record<DemandTerritoryKey, TerritoryBenchmark> = {
       { name: "EaseMyTrip", rails: [3, 2, 18, 3, 4, 0, 0] },
       { name: "Yatra", rails: [3, 2, 15, 3, 5, 0, 1] }
     ],
-    riskCallout: "MakeMyTrip trails gold standard by 22 wallet providers and 12 BNPL options — a direct conversion gap for UPI-native travelers."
+    riskCallout: "MakeMyTrip trails gold standard by 22 wallet providers and 12 BNPL options — a direct conversion gap for UPI-native travelers.",
+    conversionUpside: "+18–23%",
+    revenueRecoveryINR: "₹2.8–3.6 Cr",
+    revenueRecoveryUSD: "$340–430K"
   },
   indonesia: {
     name: "Indonesia",
@@ -854,7 +860,10 @@ const DEMAND_AUDIT_DATA: Record<DemandTerritoryKey, TerritoryBenchmark> = {
       { name: "Tiket.com", rails: [5, 4, 25, 4, 7, 0, 1] },
       { name: "PegiPegi", rails: [4, 3, 20, 3, 5, 0, 1] }
     ],
-    riskCallout: "Traveloka missing 13 VA bank connections and 5 BNPL providers vs. gold standard — high-value travelers defaulting to direct bank transfer."
+    riskCallout: "Traveloka missing 13 VA bank connections and 5 BNPL providers vs. gold standard — high-value travelers defaulting to direct bank transfer.",
+    conversionUpside: "+12–17%",
+    revenueRecoveryINR: "Rp 28–36 B",
+    revenueRecoveryUSD: "$180–230K"
   },
   china: {
     name: "China",
@@ -868,7 +877,10 @@ const DEMAND_AUDIT_DATA: Record<DemandTerritoryKey, TerritoryBenchmark> = {
       { name: "Qunar", rails: [4, 3, 22, 5, 6, 0, 2] },
       { name: "Meituan", rails: [5, 4, 28, 7, 10, 0, 2] }
     ],
-    riskCallout: "Ctrip missing 10 wallet integrations and 6 BNPL options — super-app travelers expect complete coverage at checkout."
+    riskCallout: "Ctrip missing 10 wallet integrations and 6 BNPL options — super-app travelers expect complete coverage at checkout.",
+    conversionUpside: "+22–28%",
+    revenueRecoveryINR: "¥2.1–2.8 M",
+    revenueRecoveryUSD: "$290–380K"
   },
   brazil: {
     name: "Brazil",
@@ -881,7 +893,10 @@ const DEMAND_AUDIT_DATA: Record<DemandTerritoryKey, TerritoryBenchmark> = {
       { name: "Submarino Viagens", rails: [4, 3, 15, 4, 6, 0, 3] },
       { name: "Hotel Urbano", rails: [4, 3, 18, 4, 7, 0, 3] }
     ],
-    riskCallout: "Decolar trails gold standard by 15 wallet providers and 8 BNPL options — parcelado-first travelers abandoning at payment."
+    riskCallout: "Decolar trails gold standard by 15 wallet providers and 8 BNPL options — parcelado-first travelers abandoning at payment.",
+    conversionUpside: "+15–20%",
+    revenueRecoveryINR: "R$ 1.4–1.9 M",
+    revenueRecoveryUSD: "$280–370K"
   }
 }
 
@@ -971,12 +986,23 @@ function DemandAudit({ onSwitchToExecutive }: DemandAuditProps) {
         </div>
       </div>
 
-      {/* Problem Statement Hook */}
-      <div className="text-center py-6">
-        <p className="text-4xl font-bold text-red-600 mb-2">{gapPercentage}% below gold standard</p>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Missing {gaps.find(g => g.rail === "Wallets")?.gapFromGold || 0} wallet providers and {gaps.find(g => g.rail === "BNPL")?.gapFromGold || 0} BNPL options is driving direct booking abandonment
-        </p>
+      {/* Hero KPI + Problem Statement */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Revenue Recovery Potential */}
+        <Card className="p-6 bg-gradient-to-br from-[#8021FF]/10 to-[#8021FF]/5 border-2 border-[#8021FF]/30">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Potential Annual Revenue Recovery</p>
+          <p className="text-3xl font-bold text-[#8021FF] mb-1">{territory.revenueRecoveryINR}</p>
+          <p className="text-lg text-muted-foreground">{territory.revenueRecoveryUSD}</p>
+        </Card>
+        
+        {/* Gap Summary */}
+        <Card className="p-6 bg-red-50 dark:bg-red-950/20 border-2 border-red-200 dark:border-red-900">
+          <p className="text-xs font-medium text-red-600 uppercase tracking-wide mb-2">Coverage Gap vs Gold Standard</p>
+          <p className="text-3xl font-bold text-red-600 mb-1">{gapPercentage}% below</p>
+          <p className="text-sm text-muted-foreground">
+            Missing {gaps.find(g => g.rail === "Wallets")?.gapFromGold || 0} wallet + {gaps.find(g => g.rail === "BNPL")?.gapFromGold || 0} BNPL providers
+          </p>
+        </Card>
       </div>
 
       {/* Benchmark Matrix - Hero Visual */}
@@ -1064,16 +1090,19 @@ function DemandAudit({ onSwitchToExecutive }: DemandAuditProps) {
                 })}
               </tr>
               
-              {/* Row 4: With RG Pay - All Green (matches gold standard) */}
-              <tr className="bg-[#8021FF]/5 border-b border-[#8021FF]/20">
+              {/* Row 4: Projected With RG Pay - Commercial Outcome Row */}
+              <tr className="bg-gradient-to-r from-[#8021FF]/10 to-[#8021FF]/5 border-2 border-[#8021FF]/30">
                 <td className="py-5 px-6">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#8021FF]" />
-                    <span className="font-semibold text-[#8021FF]">With RG Pay</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-[#8021FF]" />
+                      <span className="font-bold text-[#8021FF]">Projected With RG Pay</span>
+                    </div>
+                    <span className="text-xs font-semibold text-green-600 ml-5">{territory.conversionUpside} direct conversion</span>
                   </div>
                 </td>
                 {territory.gold.map((value, idx) => (
-                  <td key={idx} className="py-5 px-4 text-center bg-green-100 dark:bg-green-900/40">
+                  <td key={idx} className="py-5 px-4 text-center bg-green-100 dark:bg-green-900/40 border-t-2 border-green-300">
                     <span className="text-xl font-bold text-green-700 dark:text-green-400">{value}</span>
                   </td>
                 ))}
