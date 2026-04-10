@@ -124,6 +124,9 @@ export default function Home() {
 
 {/* Right side - Navigation */}
   <nav className="flex items-center gap-6">
+    <Link href="/experience" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+      Guest Journey
+    </Link>
     <Link href="/why-rg-pay" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
       Why RG Pay?
     </Link>
