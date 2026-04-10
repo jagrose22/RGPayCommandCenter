@@ -923,15 +923,10 @@ function DemandAudit({ onSwitchToExecutive }: DemandAuditProps) {
 
   return (
     <div className="space-y-8">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-6 flex items-center justify-between">
-        <div className="text-white">
-          <p className="text-lg font-semibold">Demand-Side Payment Audit</p>
-          <p className="text-white/80">Where OTAs lag. Which rails are missing. How far behind gold standard.</p>
-        </div>
-        <span className="px-4 py-2 bg-white/20 rounded-full text-white text-sm font-medium">
-          Competitive intelligence
-        </span>
+      {/* Clean Title */}
+      <div>
+        <h2 className="text-2xl font-bold text-foreground mb-1">Demand Audit</h2>
+        <p className="text-muted-foreground">Where checkout coverage lags market standard</p>
       </div>
 
       {/* Territory + OTA Selection */}
@@ -976,27 +971,13 @@ function DemandAudit({ onSwitchToExecutive }: DemandAuditProps) {
         </div>
       </div>
 
-      {/* Gap Summary Hero */}
-      <Card className="p-6 border-l-4 border-l-red-500 bg-red-50 dark:bg-red-950/20">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium text-red-600 uppercase tracking-wide mb-1">Coverage Gap vs Gold Standard</p>
-            <p className="text-3xl font-bold text-red-700">{totalGap} providers missing</p>
-            <p className="text-sm text-red-600/80 mt-1">{currentOTA.name} covers {totalOTA} of {totalGold} gold-standard providers ({gapPercentage}% gap)</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-green-600">{totalGold}</p>
-              <p className="text-xs text-muted-foreground">Gold Standard</p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-muted-foreground" />
-            <div className="text-center">
-              <p className="text-2xl font-bold text-red-600">{totalOTA}</p>
-              <p className="text-xs text-muted-foreground">{currentOTA.name}</p>
-            </div>
-          </div>
-        </div>
-      </Card>
+      {/* Problem Statement Hook */}
+      <div className="text-center py-6">
+        <p className="text-4xl font-bold text-red-600 mb-2">{gapPercentage}% below gold standard</p>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          Missing {gaps.find(g => g.rail === "Wallets")?.gapFromGold || 0} wallet providers and {gaps.find(g => g.rail === "BNPL")?.gapFromGold || 0} BNPL options is driving direct booking abandonment
+        </p>
+      </div>
 
       {/* Benchmark Matrix - Hero Visual */}
       <Card className="border-2 border-border overflow-hidden shadow-lg">
@@ -1049,10 +1030,10 @@ function DemandAudit({ onSwitchToExecutive }: DemandAuditProps) {
               </tr>
               
               {/* Row 3: Selected OTA - Heat-colored cells */}
-              <tr className="border-b border-border">
+              <tr className="border-b-2 border-border">
                 <td className="py-5 px-6 bg-muted/20">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#8021FF]" />
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
                     <span className="font-semibold text-foreground">{currentOTA.name}</span>
                   </div>
                 </td>
@@ -1081,6 +1062,21 @@ function DemandAudit({ onSwitchToExecutive }: DemandAuditProps) {
                     </td>
                   )
                 })}
+              </tr>
+              
+              {/* Row 4: With RG Pay - All Green (matches gold standard) */}
+              <tr className="bg-[#8021FF]/5 border-b border-[#8021FF]/20">
+                <td className="py-5 px-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#8021FF]" />
+                    <span className="font-semibold text-[#8021FF]">With RG Pay</span>
+                  </div>
+                </td>
+                {territory.gold.map((value, idx) => (
+                  <td key={idx} className="py-5 px-4 text-center bg-green-100 dark:bg-green-900/40">
+                    <span className="text-xl font-bold text-green-700 dark:text-green-400">{value}</span>
+                  </td>
+                ))}
               </tr>
             </tbody>
           </table>
